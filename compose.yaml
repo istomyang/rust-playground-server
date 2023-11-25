@@ -1,0 +1,40 @@
+services:
+  #  app:
+  #    build: ./deployment
+  #    network: rust_playground
+
+  redis:
+    image: "redis:latest"
+    container_name: redis-rust-playground-server
+    restart: always
+    networks:
+      - rust_playground
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data/data:/data
+      - redis_data/logs:/logs
+      - ./redis.conf:/usr/local/etc/redis/redis.conf
+    command: redis-server /usr/local/etc/redis/redis.conf
+
+  postgresql:
+    image: docker.io/bitnami/postgresql:16
+    networks:
+      - rust_playground
+    ports:
+      - '5432:5432'
+    volumes:
+      - 'postgresql_data:/bitnami/postgresql'
+    environment:
+      - POSTGRESQL_USERNAME=user
+      - POSTGRESQL_PASSWORD=pass
+      - POSTGRESQL_DATABASE=my_db
+
+volumes:
+  postgresql_data:
+    driver: local
+  redis_data:
+    driver: local
+
+networks:
+  rust_playground:
